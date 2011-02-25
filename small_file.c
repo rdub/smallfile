@@ -9,7 +9,9 @@
 
 // TODO: experiment with various block sizes
 // TODO: support creating a range of sizes
-const size_t blocksize = 0;
+// TODO: Somehow determine FS journal size (or at least take a flag for target journal size)
+
+const size_t target_size = 32 * 4 * 1024 * 1024;
 
 typedef struct {
 	int fd;
@@ -201,7 +203,7 @@ int finalize(char *dirname) {
 }
 
 int main(int argc, char *argv[]) {
-	uint32_t i = 0;
+	uint32_t i = 0, target_count = 0;
 	file_spec_t input = {0};
 	char tmpdir[256] = {0};
 	
@@ -214,6 +216,8 @@ int main(int argc, char *argv[]) {
 	 */
 	int rand_fd = 0, output_fd = 0;
     size_t blocksize = get_blocksize();
+	
+	target_count = target_size / blocksize;
 
 	// data block
 	uint8_t *data = (uint8_t *)malloc(blocksize);
@@ -225,6 +229,7 @@ int main(int argc, char *argv[]) {
 	fprintf(stdout, "starting up...\n");
 	
 	fprintf(stdout, "using blocksize: %lu\n", blocksize);
+	fprintf(stdout, "writing %d small files.\n", target_count);
 
 	input.blocksize = blocksize;
 	
@@ -242,7 +247,7 @@ int main(int argc, char *argv[]) {
 	fprintf(stdout, "performing writes: ");
 	fflush(stdout);
 	
-	for(i = 0; i < 1024; i++) {
+	for(i = 0; i < target_count; i++) {
 		char fname[FNAME_SIZE + 1] = {0};
 		
 		if(!small_file(i, &input, data)) {
