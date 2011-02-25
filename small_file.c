@@ -199,11 +199,10 @@ int setup(char *dirname, size_t dn_sz) {
 int finalize(char *dirname) {
 	// TODO: rmdir() the tmp directory
 	return 1;
-
+}
 
 int main(int argc, char *argv[]) {
 	uint32_t i = 0;
-<<<<<<< HEAD:small_file.c
 	file_spec_t input = {0};
 	char tmpdir[256] = {0};
 	
@@ -226,7 +225,7 @@ int main(int argc, char *argv[]) {
 
 	fprintf(stdout, "starting up...\n");
 	
-	fprintf(stdout, "using blocksize: %d\n", blocksize);
+	fprintf(stdout, "using blocksize: %lu\n", blocksize);
 
 	input.blocksize = blocksize;
 	
