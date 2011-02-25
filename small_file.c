@@ -21,6 +21,17 @@ void warn(const char *warning) {
 	fprintf(stderr, "warning: %s", warning);
 }
 
+size_t get_blocksize (void) {
+    size_t blocksize = 1024;
+    struct stat st;
+    
+	if (stat(".", &st) == 0) {
+        blocksize = st.st_blksize;        
+    }
+    
+	return blocksize;
+}
+
 int read_block(file_spec_t *input, void *buf) {
 	size_t rd_ct = 0;
 	
@@ -188,10 +199,11 @@ int setup(char *dirname, size_t dn_sz) {
 int finalize(char *dirname) {
 	// TODO: rmdir() the tmp directory
 	return 1;
-}
+
 
 int main(int argc, char *argv[]) {
 	uint32_t i = 0;
+<<<<<<< HEAD:small_file.c
 	file_spec_t input = {0};
 	char tmpdir[256] = {0};
 	
@@ -202,6 +214,8 @@ int main(int argc, char *argv[]) {
 	 * - allow setting file count
 	 * - allow setting filename len/pattern
 	 */
+	int rand_fd = 0, output_fd = 0;
+    size_t blocksize = get_blocksize();
 
 	// data block
 	uint8_t *data = (uint8_t *)malloc(blocksize);
@@ -212,6 +226,8 @@ int main(int argc, char *argv[]) {
 
 	fprintf(stdout, "starting up...\n");
 	
+	fprintf(stdout, "using blocksize: %d\n", blocksize);
+
 	input.blocksize = blocksize;
 	
 	if(!setup(tmpdir, 255)) {
