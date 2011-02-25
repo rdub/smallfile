@@ -7,10 +7,9 @@
 
 #define FNAME_SIZE	256
 
-// TODO: Learn this from the target filesystem
 // TODO: experiment with various block sizes
 // TODO: support creating a range of sizes
-const size_t blocksize = 24;
+const size_t blocksize = 0;
 
 typedef struct {
 	int fd;
