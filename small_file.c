@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
 #define FNAME_SIZE	256
 
@@ -27,14 +28,21 @@ int main(int argc, char *argv[]) {
 		perror("open");
 		exit(-1);
 	}
+
+	fprintf(stdout, "starting up...\n");
+
+	// disable execute bits, enable RW for owner
+	umask(177);
 	
-	printf("performing writes: ");
+	fprintf(stdout, "performing writes: ");
+	fflush(stdout);
 	
 	for(i = 0; i < 1024; i++) {
 		char fname[FNAME_SIZE + 1] = {0};
 		ssize_t rd_ct = 0, wr_ct = 0;
 		
-		printf(".");
+		fprintf(stdout, ".");
+		fflush(stdout);
 		
 		// TODO: Better random filename
 		if(!snprintf(fname, FNAME_SIZE, "tmp%d.smallfile", i + 1)) {
@@ -54,12 +62,12 @@ int main(int argc, char *argv[]) {
 		// do the block read/write
 		rd_ct = read(rand_fd, data, blocksize);
 		if(rd_ct != blocksize) {
-			printf("\nwarning: small block.\n");
+			fprintf(stderr, "warning: small block.\n");
 		}
 		
 		wr_ct = write(output_fd, data, blocksize);
 		if(wr_ct != blocksize) {
-			printf("\nwarning: small block.\n");
+			fprintf(stderr, "warning: small block.\n");
 		}
 		
 		// Force the write
@@ -77,5 +85,6 @@ int main(int argc, char *argv[]) {
 	// Full drive write/cache sync
 	fcntl(0, F_FULLFSYNC, 0);
 
-	printf("\ndone.\n");
+	fprintf(stdout, "\ndone.\n");
+	fflush(stdout);
 }
