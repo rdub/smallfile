@@ -7,12 +7,19 @@
 
 #define FNAME_SIZE	256
 
-// TODO: Learn this from the target filesystem
-const size_t blocksize = 512;
+size_t getBlocksize (void) {
+    size_t blocksize = 1024;
+    struct stat st;
+    if (stat(".", &st) == 0) {
+        blocksize = st.st_blksize;        
+    }
+    return blocksize;
+}
 
 int main(int argc, char *argv[]) {
 	uint32_t i = 0;
 	int rand_fd = 0, output_fd = 0;
+    size_t blocksize = getBlocksize();
 
 	// data block
 	uint8_t *data = (uint8_t *)malloc(blocksize);
