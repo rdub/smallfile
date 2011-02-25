@@ -6,12 +6,14 @@
 
 #define FNAME_SIZE	256
 
-const size_t blocksize = 1024;
+// TODO: Learn this from the target filesystem
+const size_t blocksize = 512;
 
 int main(int argc, char *argv[]) {
 	uint32_t i = 0;
 	int rand_fd = 0, output_fd = 0;
-	
+
+	// data block
 	uint8_t *data = (uint8_t *)malloc(blocksize);
 	if(!data) {
 		perror("malloc");
@@ -19,6 +21,7 @@ int main(int argc, char *argv[]) {
 	}
 	
 	// Don't let a symlink fool us.
+	// TODO: Allow using urandom or random
 	rand_fd = open("/dev/urandom", O_RDONLY | O_NOFOLLOW);
 	if(rand_fd < 0) {
 		perror("open");
@@ -33,6 +36,7 @@ int main(int argc, char *argv[]) {
 		
 		printf(".");
 		
+		// TODO: Better random filename
 		if(!snprintf(fname, FNAME_SIZE, "tmp%d.smallfile", i + 1)) {
 			perror("\nsnprintf");
 			exit(-2);
@@ -44,7 +48,7 @@ int main(int argc, char *argv[]) {
 			exit(-3);
 		}
 		
-		// turn caching off 
+		// turn disk caching off 
 		fcntl(output_fd, F_NOCACHE, 1);
 		
 		// do the block read/write
@@ -54,6 +58,9 @@ int main(int argc, char *argv[]) {
 		}
 		
 		wr_ct = write(output_fd, data, blocksize);
+		if(wr_ct != blocksize) {
+			printf("\nwarning: small block.\n");
+		}
 		
 		// Force the write
 		sync();
@@ -65,7 +72,6 @@ int main(int argc, char *argv[]) {
 		
 		// kill the file
 		unlink(fname);
-		
 	}
 	
 	// Full drive write/cache sync
