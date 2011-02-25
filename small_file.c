@@ -246,6 +246,9 @@ int main(int argc, char *argv[]) {
 	if(!finalize(tmpdir)) {
 		fprintf(stderr, "error: failed to finalize.\n");
 	}
+	
+	// Full drive write/cache sync
+	fcntl(0, F_FULLFSYNC, 0);
 
 	fprintf(stdout, "\ndone.\n");
 	fflush(stdout);
